@@ -31,9 +31,13 @@ const genCaption = document.getElementById('genCaption');
 const promptInput = document.getElementById('promptInput');
 
 // ============================================================
-// Talks to your backend (Flask app.py or PHP generate.php), which
-// holds the fal.ai key server-side. No API key lives in this file.
-// Change this to wherever your backend is hosted.
+// Talks to your backend (Flask app.py), which holds the fal.ai key
+// server-side. No API key lives in this file.
+//
+// 👉 AFTER YOU DEPLOY TO RAILWAY: replace the URL below with your
+// Railway public domain, e.g.
+// "https://your-app-name.up.railway.app/api/generate"
+// (Railway shows this under Settings → Networking → Generate Domain)
 // ============================================================
 const BACKEND_URL = "http://localhost:5000/api/generate";
 
