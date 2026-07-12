@@ -118,4 +118,9 @@ def _result():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    # Railway (and most hosts) inject the port to bind to via $PORT.
+    # Falls back to 5000 for local development.
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
+    app.run(host="0.0.0.0", port=port, debug=debug)
+  
