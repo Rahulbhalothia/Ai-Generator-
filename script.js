@@ -4,13 +4,12 @@
    so nothing depends on external image/video URLs that could
    fail to load.
 
-   TO CONNECT YOUR REAL fal.ai BACKEND (app.py on Railway):
-   set BACKEND_URL below to your deployed endpoint and set
-   DEMO_MODE = false. callBackend() already speaks the
-   submit → status → result protocol your Flask proxy expects.
+   Connected to the real fal.ai backend (app.py on Render).
+   callBackend() speaks the submit → status → result protocol
+   your Flask proxy expects.
    ============================================================ */
-const DEMO_MODE = true;
-const BACKEND_URL = "https://YOUR-APP.up.railway.app/api/generate";
+const DEMO_MODE = false;
+const BACKEND_URL = "https://ai-generator-z30l.onrender.com/api/generate";
 
 const UNLIMITED_CREDITS = true;
 let credits = 24; // ignored when UNLIMITED_CREDITS is true
@@ -318,6 +317,8 @@ function demoGenerate(){
   });
 }
 
+let lastVideoUrl = null;
+
 async function runGeneration(){
   if (!DEMO_MODE && !UNLIMITED_CREDITS && credits <= 0) { showToast('Out of credits'); return; }
   showScreen('screen-generate');
@@ -331,6 +332,7 @@ async function runGeneration(){
   setRing(0);
   genStatus.textContent = 'Sending prompt…';
   goGenerate.disabled = true;
+  lastVideoUrl = null;
 
   const durationTxt = document.querySelector('#durationSelect .valtext').textContent;
   const ratioTxt = document.querySelector('#ratioSelect .valtext').textContent;
@@ -339,13 +341,20 @@ async function runGeneration(){
   try {
     if (DEMO_MODE) {
       await demoGenerate();
+      document.getElementById('genRing').style.display = 'none';
+      genStatus.textContent = 'Done';
+      genCanvas.style.display = 'block';
+      startResultLoop(selectedStyle.hue);
     } else {
-      await callBackend(prompt, duration, ratioTxt);
+      genStatus.textContent = 'Sending prompt to fal.ai…';
+      const videoUrl = await callBackend(prompt, duration, ratioTxt);
+      lastVideoUrl = videoUrl;
+      document.getElementById('genRing').style.display = 'none';
+      genStatus.textContent = 'Done';
+      genCanvas.style.display = 'block';
+      // Show a themed still while the real video is ready to download.
+      paintScene(genCanvas, selectedStyle.hue, 99, 1.4);
     }
-    document.getElementById('genRing').style.display = 'none';
-    genStatus.textContent = 'Done';
-    genCanvas.style.display = 'block';
-    startResultLoop(selectedStyle.hue);
     resultActions.classList.add('show');
 
     library.unshift({
@@ -369,7 +378,25 @@ goGenerate.addEventListener('click', runGeneration);
 fabGenerate.addEventListener('click', () => { showScreen('screen-create'); document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', false)); });
 regenBtn.addEventListener('click', runGeneration);
 
-downloadBtn.addEventListener('click', () => {
+downloadBtn.addEventListener('click', async () => {
+  if (!DEMO_MODE && lastVideoUrl){
+    try {
+      const resp = await fetch(lastVideoUrl);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = 'reelmind-render.mp4';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+      showToast('Video saved');
+    } catch (err) {
+      window.open(lastVideoUrl, '_blank');
+    }
+    return;
+  }
   try {
     const link = document.createElement('a');
     link.href = genCanvas.toDataURL('image/png');
