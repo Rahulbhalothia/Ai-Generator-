@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Reelmind — AI Video Generator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="phone">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span>9:41</span>
+    <span>●●● ▲ 100%</span>
+  </div>
+
+  <div class="screens">
+
+    <!-- EXPLORE (default landing feed, like Kling/Pika discover tab) -->
+    <div class="screen active" id="screen-explore">
+      <div class="feed-topbar">
+        <div class="feed-tabs">
+          <div class="feed-tab active" data-feed="foryou">For You</div>
+          <div class="feed-tab" data-feed="following">Following</div>
+        </div>
+        <div class="avatar-sm" id="openProfileFromFeed">RS</div>
+      </div>
+      <div id="feedStack"></div>
+    </div>
+
+    <!-- CREATE -->
+    <div class="screen" id="screen-create">
+      <div class="create-wrap">
+        <div class="create-head">
+          <div class="eyebrow">TEXT TO VIDEO</div>
+          <h1>What will you<br>create today?</h1>
+        </div>
+
+        <div class="prompt-card">
+          <label>Prompt</label>
+          <textarea id="promptInput" rows="3" placeholder="A lone cyclist crossing a foggy bridge at dawn...">A lone cyclist crossing a foggy bridge at dawn, slow tracking shot, warm rim light</textarea>
+          <div class="chip-row">
+            <div class="chip" id="pillRef">📎 Reference image</div>
+            <div class="chip active" id="pillEnhance">✨ Enhance prompt</div>
+          </div>
+        </div>
+
+        <div class="style-scroll" id="styleScroll"></div>
+
+        <div class="row">
+          <div class="mini-select" id="durationSelect" data-values="5s,8s,10s">
+            <div><span class="k">Duration</span><span class="valtext">8s</span></div><span class="arrow">▾</span>
+            <div class="mini-dropdown"></div>
+          </div>
+          <div class="mini-select" id="ratioSelect" data-values="9:16,16:9,1:1">
+            <div><span class="k">Ratio</span><span class="valtext">9:16</span></div><span class="arrow">▾</span>
+            <div class="mini-dropdown"></div>
+          </div>
+        </div>
+
+        <button class="generate-btn" id="goGenerate">✦ Generate Video</button>
+        <div class="credit-note" id="creditNote">Uses 1 credit · 24 remaining</div>
+      </div>
+    </div>
+
+    <!-- GENERATE / RESULT -->
+    <div class="screen" id="screen-generate">
+      <div class="gen-screen">
+        <div class="gen-frame" id="genFrame">
+          <canvas id="genCanvas" width="360" height="640"></canvas>
+          <div class="progress-ring" id="genRing">
+            <svg width="88" height="88" viewBox="0 0 88 88">
+              <defs>
+                <linearGradient id="gradStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#8b5cf6"/>
+                  <stop offset="100%" stop-color="#ec4899"/>
+                </linearGradient>
+              </defs>
+              <circle class="bg" cx="44" cy="44" r="38"></circle>
+              <circle class="fg" id="ringFg" cx="44" cy="44" r="38"></circle>
+            </svg>
+            <div class="progress-pct" id="genPct">0%</div>
+          </div>
+        </div>
+        <div class="gen-status" id="genStatus">Reading prompt…</div>
+        <div class="gen-caption" id="genCaption">"A lone cyclist crossing a foggy bridge at dawn, slow tracking shot, warm rim light"</div>
+
+        <div class="result-actions" id="resultActions">
+          <button class="rbtn-download" id="downloadBtn">⬇ Save</button>
+          <button class="rbtn-secondary" id="regenBtn">↻ Redo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div class="screen" id="screen-library">
+      <div class="lib-wrap">
+        <div class="lib-head"><h2 style="font-size:24px;">My Creations</h2></div>
+        <div class="lib-grid" id="libraryGrid"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="screen" id="screen-profile">
+      <div class="prof-wrap">
+        <div class="profile-card">
+          <div class="profile-avatar">RS</div>
+          <div style="font-weight:700; font-size:16px;">Rahul S.</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:2px;">@rahul.s</div>
+          <div class="plan-pill" id="planPill">PRO · 24 credits</div>
+          <div class="credit-bar"><div class="credit-bar-fill" id="creditFill"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-box"><div class="n" id="renderCount">32</div><div class="l">Renders</div></div>
+          <div class="stat-box"><div class="n">1.2GB</div><div class="l">Storage</div></div>
+          <div class="stat-box"><div class="n">4</div><div class="l">Following</div></div>
+        </div>
+        <div class="lib-item">Account settings<span class="arrow">›</span></div>
+        <div class="lib-item">Billing & credits<span class="arrow">›</span></div>
+        <div class="lib-item">Export defaults<span class="arrow">›</span></div>
+        <div class="lib-item">Help & support<span class="arrow">›</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="tabbar">
+    <div class="tab active" data-screen="screen-explore"><span class="ic">⌂</span><span class="lb">Explore</span></div>
+    <div class="tab" data-screen="screen-library"><span class="ic">▤</span><span class="lb">Library</span></div>
+    <div class="tab-fab" id="fabGenerate">✦</div>
+    <div class="tab" data-screen="screen-profile"><span class="ic">◉</span><span class="lb">Profile</span></div>
+    <div class="tab" data-screen="screen-create"><span class="ic">☰</span><span class="lb">More</span></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
