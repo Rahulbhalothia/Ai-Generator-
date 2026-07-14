@@ -318,6 +318,22 @@ function demoGenerate(){
 }
 
 let lastVideoUrl = null;
+let genVideoEl = null;
+
+function getVideoEl(){
+  if (genVideoEl) return genVideoEl;
+  genVideoEl = document.createElement('video');
+  genVideoEl.setAttribute('loop', '');
+  genVideoEl.setAttribute('muted', '');
+  genVideoEl.setAttribute('playsinline', '');
+  genVideoEl.setAttribute('autoplay', '');
+  genVideoEl.style.width = '100%';
+  genVideoEl.style.height = '100%';
+  genVideoEl.style.objectFit = 'cover';
+  genVideoEl.style.display = 'none';
+  genCanvas.parentElement.appendChild(genVideoEl);
+  return genVideoEl;
+}
 
 async function runGeneration(){
   if (!DEMO_MODE && !UNLIMITED_CREDITS && credits <= 0) { showToast('Out of credits'); return; }
@@ -326,6 +342,10 @@ async function runGeneration(){
   const prompt = promptInput.value.trim() || 'Untitled shot';
   genCaption.textContent = '"' + prompt + '"';
   genCanvas.style.display = 'none';
+  const videoEl = getVideoEl();
+  videoEl.style.display = 'none';
+  videoEl.pause();
+  videoEl.removeAttribute('src');
   document.getElementById('genRing').style.display = 'flex';
   resultActions.classList.remove('show');
   genPct.textContent = '0%';
@@ -351,9 +371,9 @@ async function runGeneration(){
       lastVideoUrl = videoUrl;
       document.getElementById('genRing').style.display = 'none';
       genStatus.textContent = 'Done';
-      genCanvas.style.display = 'block';
-      // Show a themed still while the real video is ready to download.
-      paintScene(genCanvas, selectedStyle.hue, 99, 1.4);
+      videoEl.src = videoUrl;
+      videoEl.style.display = 'block';
+      videoEl.play().catch(() => {});
     }
     resultActions.classList.add('show');
 
@@ -409,3 +429,4 @@ downloadBtn.addEventListener('click', async () => {
     showToast('Download failed');
   }
 });
+     
