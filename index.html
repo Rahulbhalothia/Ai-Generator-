@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+
+<title>ReelMind AI • Next Generation Video Creator</title>
+
+<meta name="description"
+      content="Generate cinematic AI videos with ReelMind AI. Powered by fal.ai.">
+
+<meta name="theme-color" content="#0b0b12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ReelMind">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- ============================= -->
+<!-- Animated Aurora Background -->
+<!-- ============================= -->
+
+<div class="aurora">
+    <span class="blob blob1"></span>
+    <span class="blob blob2"></span>
+    <span class="blob blob3"></span>
+</div>
+
+<!-- ============================= -->
+<!-- Loading Screen -->
+<!-- ============================= -->
+
+<div id="loadingScreen">
+
+    <div class="loading-logo">
+
+        <div class="logo-ring"></div>
+
+        <h1>ReelMind</h1>
+
+        <p>Preparing AI Studio...</p>
+
+    </div>
+
+</div>
+
+<!-- ============================= -->
+<!-- Main App -->
+<!-- ============================= -->
+
+<div id="app">
+
+<!-- Sidebar -->
+
+<aside class="sidebar">
+
+<div class="brand">
+
+<div class="brand-icon">
+
+✨
+
+</div>
+
+<div>
+
+<h2>ReelMind</h2>
+
+<span>AI Studio</span>
+
+</div>
+
+</div>
+
+<nav>
+
+<button class="nav-item active" data-screen="home">
+
+<span>🏠</span>
+
+Home
+
+</button>
+
+<button class="nav-item" data-screen="create">
+
+<span>🎬</span>
+
+Create
+
+</button>
+
+<button class="nav-item" data-screen="library">
+
+<span>📂</span>
+
+Library
+
+</button>
+
+<button class="nav-item" data-screen="explore">
+
+<span>🌍</span>
+
+Explore
+
+</button>
+
+<button class="nav-item" data-screen="profile">
+
+<span>👤</span>
+
+Profile
+
+</button>
+
+<button class="nav-item" data-screen="settings">
+
+<span>⚙</span>
+
+Settings
+
+</button>
+
+</nav>
+
+</aside>
+
+<!-- Main Content -->
+
+<main class="main">
+
+<!-- ========================= -->
+<!-- HOME SCREEN -->
+<!-- ========================= -->
+
+<section id="home" class="screen active">
+
+<header class="hero">
+
+<div>
+
+<p class="badge">
+
+✨ Powered by fal.ai
+
+</p>
+
+<h1>
+
+Create stunning AI videos in seconds
+
+</h1>
+
+<p>
+
+Turn text into cinematic videos with professional quality.
+
+</p>
+
+</div>
+
+<div class="hero-actions">
+
+<button id="newProject">
+
++ New Project
+
+</button>
+
+<button id="openLibrary">
+
+Open Library
+
+</button>
+
+</div>
+
+</header>
+
+<!-- Prompt Card -->
+
+<div class="prompt-card">
+
+<label>
+
+Describe your video
+
+</label>
+
+<textarea
+id="promptInput"
+rows="5"
+placeholder="A futuristic city at sunset, cinematic drone shot, ultra realistic..."></textarea>
+
+<div class="prompt-tools">
+
+<button id="voicePrompt">
+
+🎤 Voice
+
+</button>
+
+<button id="uploadImage">
+
+🖼 Image
+
+</button>
+
+<button id="enhancePrompt">
+
+✨ Enhance
+
+</button>
+
+<button id="historyPrompt">
+
+📝 History
+
+</button>
+
+</div>
+
+</div>
+
+<!-- Prompt Suggestions -->
+
+<section class="suggestions">
+
+<h3>
+
+Trending Prompts
+
+</h3>
+
+<div class="chips">
+
+<button class="suggest-chip">
+
+Cyberpunk City
+
+</button>
+
+<button class="suggest-chip">
+
+Anime Battle
+
+</button>
+
+<button class="suggest-chip">
+
+Fantasy Forest
+
+</button>
+
+<button class="suggest-chip">
+
+Luxury Car
+
+</button>
+
+<button class="suggest-chip">
+
+Cinematic Ocean
+
+</button>
+
+<button class="suggest-chip">
+
+Space Travel
+
+</button>
+
+</div>
+
+</section>
+
+</section>
+
+<!-- ================================= -->
+<!-- CREATE SCREEN -->
+<!-- ================================= -->
+
+<section id="create" class="screen">
+
+<div class="screen-header">
+
+<h2>Create Video</h2>
+
+</div>
+
+<!-- ================================= -->
+<!-- AI Model Selection -->
+<!-- ================================= -->
+
+<section class="panel">
+
+<div class="panel-head">
+
+<h3>AI Model</h3>
+
+<span>Choose your rendering engine</span>
+
+</div>
+
+<div class="model-grid">
+
+<div class="model-card active" data-model="kling">
+<div class="model-icon">🎬</div>
+<h4>Kling 2.1</h4>
+<p>Best cinematic quality</p>
+</div>
+
+<div class="model-card" data-model="veo">
+<div class="model-icon">🎥</div>
+<h4>Google Veo</h4>
+<p>Ultra realistic motion</p>
+</div>
+
+<div class="model-card" data-model="pixverse">
+<div class="model-icon">⚡</div>
+<h4>PixVerse</h4>
+<p>Fast generation</p>
+</div>
+
+<div class="model-card" data-model="hailuo">
+<div class="model-icon">🌌</div>
+<h4>Hailuo AI</h4>
+<p>Creative scenes</p>
+</div>
+
+<div class="model-card" data-model="wan">
+<div class="model-icon">✨</div>
+<h4>Wan 2.2</h4>
+<p>Smooth animation</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- Video Style -->
+<!-- ================================= -->
+
+<section class="panel">
+
+<div class="panel-head">
+
+<h3>Video Style</h3>
+
+</div>
+
+<div class="style-grid">
+
+<div class="style-item active">
+<div class="style-preview cinematic"></div>
+<span>Cinematic</span>
+</div>
+
+<div class="style-item">
+<div class="style-preview anime"></div>
+<span>Anime</span>
+</div>
+
+<div class="style-item">
+<div class="style-preview realistic"></div>
+<span>Realistic</span>
+</div>
+
+<div class="style-item">
+<div class="style-preview cyber"></div>
+<span>Cyberpunk</span>
+</div>
+
+<div class="style-item">
+<div class="style-preview fantasy"></div>
+<span>Fantasy</span>
+</div>
+
+<div class="style-item">
+<div class="style-preview noir"></div>
+<span>Noir</span>
+</div>
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- Generation Settings -->
+<!-- ================================= -->
+
+<section class="panel">
+
+<div class="panel-head">
+
+<h3>Generation Settings</h3>
+
+</div>
+
+<div class="settings-grid">
+
+<div class="setting">
+
+<label>Duration</label>
+
+<select id="duration">
+
+<option>5 Seconds</option>
+
+<option selected>8 Seconds</option>
+
+<option>10 Seconds</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Aspect Ratio</label>
+
+<select id="ratio">
+
+<option selected>9:16</option>
+
+<option>16:9</option>
+
+<option>1:1</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>Quality</label>
+
+<select id="quality">
+
+<option>Standard</option>
+
+<option selected>High</option>
+
+<option>Ultra</option>
+
+</select>
+
+</div>
+
+<div class="setting">
+
+<label>FPS</label>
+
+<select id="fps">
+
+<option>24 FPS</option>
+
+<option selected>30 FPS</option>
+
+<option>60 FPS</option>
+
+</select>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- Camera Motion -->
+<!-- ================================= -->
+
+<section class="panel">
+
+<div class="panel-head">
+
+<h3>Camera Motion</h3>
+
+</div>
+
+<div class="motion-grid">
+
+<button class="motion active">Static</button>
+
+<button class="motion">Pan Left</button>
+
+<button class="motion">Pan Right</button>
+
+<button class="motion">Zoom In</button>
+
+<button class="motion">Zoom Out</button>
+
+<button class="motion">Orbit</button>
+
+<button class="motion">Drone Shot</button>
+
+<button class="motion">Tracking</button>
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- Negative Prompt -->
+<!-- ================================= -->
+
+<section class="panel">
+
+<label>
+
+Negative Prompt
+
+</label>
+
+<textarea id="negativePrompt"
+
+rows="3"
+
+placeholder="low quality, blurry, watermark, duplicate, bad anatomy..."></textarea>
+
+</section>
+
+<!-- ================================= -->
+<!-- Advanced Options -->
+<!-- ================================= -->
+
+<details class="advanced">
+
+<summary>
+
+⚙ Advanced Settings
+
+</summary>
+
+<div class="advanced-body">
+
+<label>
+
+Creativity
+
+</label>
+
+<input type="range"
+
+min="0"
+
+max="100"
+
+value="70">
+
+<label>
+
+Motion Strength
+
+</label>
+
+<input type="range"
+
+min="0"
+
+max="100"
+
+value="80">
+
+<label>
+
+Seed
+
+</label>
+
+<input
+
+type="number"
+
+placeholder="Random">
+
+<label>
+
+Output Name</label>
+
+<input
+
+type="text"
+
+placeholder="My Awesome Video">
+
+</div>
+
+</details>
+
+<!-- ================================= -->
+<!-- Generate Button -->
+<!-- ================================= -->
+
+<div class="generate-area">
+
+<button id="generateVideo" class="generate-btn">
+
+✨ Generate AI Video
+
+</button>
+
+<p>
+
+Average render time:
+<strong>30–90 Seconds</strong>
+
+</p>
+
+</div>
+
+</section>
+<!-- CREATE SCREEN END -->
+
+<!-- ================================= -->
+<!-- VIDEO PREVIEW SCREEN -->
+<!-- ================================= -->
+
+<section id="preview" class="screen">
+
+<div class="preview-container">
+
+<video
+id="previewVideo"
+controls
+playsinline
+autoplay
+loop>
+</video>
+
+<div class="preview-overlay">
+
+<h2>Your AI Video is Ready</h2>
+
+<p id="videoTitle">Untitled Video</p>
+
+<div class="preview-actions">
+
+<button id="downloadVideo">
+⬇ Download
+</button>
+
+<button id="shareVideo">
+📤 Share
+</button>
+
+<button id="regenerateVideo">
+🔄 Regenerate
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- RENDER PROGRESS -->
+<!-- ================================= -->
+
+<div id="renderModal" class="modal">
+
+<div class="modal-card">
+
+<div class="loader-ring"></div>
+
+<h2>Generating Video...</h2>
+
+<p id="renderStatus">
+
+Preparing AI...
+
+</p>
+
+<div class="progress-bar">
+
+<div id="progressFill"></div>
+
+</div>
+
+<span id="progressText">
+
+0%
+
+</span>
+
+</div>
+
+</div>
+
+<!-- ================================= -->
+<!-- LIBRARY -->
+<!-- ================================= -->
+
+<section id="library" class="screen">
+
+<div class="screen-header">
+
+<h2>
+
+My Library
+
+</h2>
+
+<input
+type="search"
+placeholder="Search videos...">
+
+</div>
+
+<div id="libraryGrid"
+
+class="library-grid">
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- EXPLORE -->
+<!-- ================================= -->
+
+<section id="explore"
+
+class="screen">
+
+<div class="screen-header">
+
+<h2>
+
+Explore
+
+</h2>
+
+</div>
+
+<div id="feedContainer">
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- PROFILE -->
+<!-- ================================= -->
+
+<section id="profile"
+
+class="screen">
+
+<div class="profile-card">
+
+<div class="profile-avatar">
+
+RS
+
+</div>
+
+<h2>
+
+Rahul Sharma
+
+</h2>
+
+<p>
+
+@rahul_ai
+
+</p>
+
+<div class="profile-stats">
+
+<div>
+
+<strong id="renderCount">
+
+0
+
+</strong>
+
+<span>
+
+Videos
+
+</span>
+
+</div>
+
+<div>
+
+<strong>
+
+124K
+
+</strong>
+
+<span>
+
+Views
+
+</span>
+
+</div>
+
+<div>
+
+<strong>
+
+Pro
+
+</strong>
+
+<span>
+
+Plan
+
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- SETTINGS -->
+<!-- ================================= -->
+
+<section id="settings"
+
+class="screen">
+
+<h2>
+
+Settings
+
+</h2>
+
+<div class="settings-list">
+
+<button>
+
+👤 Account
+
+</button>
+
+<button>
+
+💳 Billing
+
+</button>
+
+<button>
+
+🎨 Appearance
+
+</button>
+
+<button>
+
+🌐 Language
+
+</button>
+
+<button>
+
+📱 Notifications
+
+</button>
+
+<button>
+
+❓ Help
+
+</button>
+
+</div>
+
+</section>
+
+<!-- ================================= -->
+<!-- FLOATING BUTTON -->
+<!-- ================================= -->
+
+<button
+id="floatingGenerate"
+class="floating-btn">
+
+✨
+
+</button>
+
+<!-- ================================= -->
+<!-- TOAST -->
+<!-- ================================= -->
+
+<div
+id="toast"
+
+class="toast">
+
+</div>
+
+<!-- ================================= -->
+<!-- MOBILE NAVIGATION -->
+<!-- ================================= -->
+
+<nav class="bottom-nav">
+
+<button
+class="nav-btn active"
+data-screen="home">
+
+🏠
+
+<span>
+
+Home
+
+</span>
+
+</button>
+
+<button
+class="nav-btn"
+data-screen="explore">
+
+🌍
+
+<span>
+
+Explore
+
+</span>
+
+</button>
+
+<button
+class="nav-btn generate-center"
+id="mobileGenerate">
+
+✨
+
+</button>
+
+<button
+class="nav-btn"
+data-screen="library">
+
+📂
+
+<span>
+
+Library
+
+</span>
+
+</button>
+
+<button
+class="nav-btn"
+data-screen="profile">
+
+👤
+
+<span>
+
+Profile
+
+</span>
+
+</button>
+
+</nav>
+
+</main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
