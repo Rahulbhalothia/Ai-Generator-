@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: reelmind-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /healthz
+    envVars:
+      - key: FAL_KEY
+        sync: false
+      - key: FAL_MODEL
+        value: fal-ai/kling-video/v1/standard/text-to-video
+      - key: ALLOWED_ORIGIN
+        value: "*"
