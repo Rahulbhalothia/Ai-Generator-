@@ -29,7 +29,7 @@ load_dotenv()
 # CONFIG
 # ============================================================
 
-FAL_KEY = os.getenv("FAL_KEY")
+FAL_KEY = os.getenv("830a3df412fb482dbdbc68c1c6bf1bfc")
 
 FAL_MODEL = os.getenv(
     "FAL_MODEL",
