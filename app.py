@@ -1,7 +1,7 @@
 # ============================================================
 # ReelMind AI Backend
-# app.py
-# Flask Configuration + Security + Health Check + Generation
+# app.py (Production Ready)
+# Part 1 - Configuration + Security + Flask
 # ============================================================
 
 import os
@@ -10,13 +10,7 @@ import logging
 import requests
 
 from dotenv import load_dotenv
-
-from flask import (
-    Flask,
-    jsonify,
-    request
-)
-
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 # ============================================================
@@ -26,14 +20,20 @@ from flask_cors import CORS
 load_dotenv()
 
 # ============================================================
-# CONFIG
+# ENVIRONMENT VARIABLES
 # ============================================================
 
-FAL_KEY = os.getenv("830a3df412fb482dbdbc68c1c6bf1bfc")
+FAL_KEY = os.getenv("FAL_KEY")
 
 FAL_MODEL = os.getenv(
     "FAL_MODEL",
     "fal-ai/kling-video/v1/standard/text-to-video"
+)
+
+PORT = int(os.getenv("PORT", "5000"))
+
+DEBUG = (
+    os.getenv("FLASK_DEBUG", "false").lower() == "true"
 )
 
 ALLOWED_ORIGIN = os.getenv(
@@ -41,23 +41,11 @@ ALLOWED_ORIGIN = os.getenv(
     "*"
 )
 
-PORT = int(
-    os.getenv(
-        "PORT",
-        "5000"
-    )
-)
-
-DEBUG = (
-    os.getenv(
-        "FLASK_DEBUG",
-        "false"
-    ).lower()
-    == "true"
-)
+# ============================================================
+# APP CONFIG
+# ============================================================
 
 REQUEST_TIMEOUT = 60
-
 STATUS_TIMEOUT = 30
 
 MAX_PROMPT_LENGTH = 2000
@@ -86,12 +74,12 @@ logging.basicConfig(
 logger = logging.getLogger("ReelMind")
 
 # ============================================================
-# VALIDATION
+# VALIDATE ENV
 # ============================================================
 
 if not FAL_KEY:
     raise RuntimeError(
-        "FAL_KEY environment variable missing."
+        "FAL_KEY not found. Please create a .env file."
     )
 
 # ============================================================
@@ -119,7 +107,7 @@ FAL_HEADERS = {
 }
 
 # ============================================================
-# UTILITIES
+# RESPONSE HELPERS
 # ============================================================
 
 def error(message, code=400):
@@ -136,7 +124,12 @@ def success(data):
     })
 
 
+# ============================================================
+# VALIDATION
+# ============================================================
+
 def validate_prompt(prompt):
+
     prompt = (prompt or "").strip()
 
     if not prompt:
@@ -147,40 +140,49 @@ def validate_prompt(prompt):
 
     return prompt
 
+
 # ============================================================
 # HEALTH CHECK
 # ============================================================
 
 @app.get("/")
 def home():
+
     return jsonify({
+
         "name": "ReelMind AI Backend",
+
+        "version": "3.0",
+
         "status": "running",
-        "version": "2.0"
+
+        "model": FAL_MODEL
+
     })
 
 
 @app.get("/healthz")
 def health():
+
     return jsonify({
+
         "status": "healthy",
-        "model": FAL_MODEL,
-        "time": int(time.time())
+
+        "timestamp": int(time.time())
+
     })
 
+
 # ============================================================
-# API ROOT
+# API ROUTER
 # ============================================================
 
 @app.route(
     "/api/generate",
-    methods=[
-        "GET",
-        "POST",
-        "OPTIONS"
-    ]
+    methods=["GET", "POST", "OPTIONS"]
 )
 def api():
+
     if request.method == "OPTIONS":
         return "", 204
 
@@ -191,33 +193,30 @@ def api():
 
     if action == "submit":
         return submit_generation()
+
     elif action == "status":
         return generation_status()
+
     elif action == "result":
         return generation_result()
 
-    return error("Unknown action")
+    return error("Unknown action", 404)
 
 # ============================================================
+# PART 2 STARTS FROM submit_generation()
+# ============================================================# ============================================================
 # SUBMIT GENERATION
 # ============================================================
 
 def submit_generation():
-    data = request.get_json(silent=True) or {}
 
-    # ----------------------------
-    # Read Input
-    # ----------------------------
+    data = request.get_json(silent=True) or {}
 
     prompt = validate_prompt(data.get("prompt"))
 
     duration = str(data.get("duration", "8"))
 
     ratio = data.get("aspect_ratio", "9:16")
-
-    # ----------------------------
-    # Validation
-    # ----------------------------
 
     if not prompt:
         return error("Prompt is required.")
@@ -234,19 +233,18 @@ def submit_generation():
         "aspect_ratio": ratio
     }
 
-    logger.info("Submitting request to fal.ai")
-
     url = f"https://queue.fal.run/{FAL_MODEL}"
 
-    # ----------------------------
-    # Retry Logic
-    # ----------------------------
-
     retries = 3
-    last_error = None
 
     for attempt in range(retries):
+
         try:
+
+            logger.info(
+                f"Submitting request ({attempt+1}/{retries})"
+            )
+
             response = requests.post(
                 url,
                 headers=FAL_HEADERS,
@@ -255,38 +253,51 @@ def submit_generation():
             )
 
             if response.status_code >= 500:
-                raise Exception("Fal server error")
+                raise Exception("Fal temporary server error")
 
             if not response.ok:
+
                 try:
                     body = response.json()
-                    message = body.get("error", response.text)
+                    message = body.get(
+                        "error",
+                        response.text
+                    )
                 except Exception:
                     message = response.text
 
-                return error(message, response.status_code)
+                return error(
+                    message,
+                    response.status_code
+                )
 
-            result = response.json()
+            logger.info("Generation submitted.")
 
-            logger.info("Generation request accepted")
-
-            return jsonify(result)
+            return jsonify(response.json())
 
         except Exception as e:
-            last_error = e
-            logger.warning(f"Retry {attempt+1}/{retries}: {e}")
+
+            logger.warning(str(e))
+
+            if attempt == retries - 1:
+                return error(
+                    "Unable to connect to fal.ai",
+                    502
+                )
+
             time.sleep(2)
 
-    logger.error(f"Submit failed: {last_error}")
-
-    return error("Unable to connect to fal.ai", 502)
 
 # ============================================================
 # STATUS
 # ============================================================
 
 def generation_status():
-    request_id = request.args.get("request_id", "").strip()
+
+    request_id = request.args.get(
+        "request_id",
+        ""
+    ).strip()
 
     if not request_id:
         return error("request_id is required.")
@@ -298,6 +309,7 @@ def generation_status():
     )
 
     try:
+
         response = requests.get(
             url,
             headers=FAL_HEADERS,
@@ -305,13 +317,20 @@ def generation_status():
         )
 
         if not response.ok:
-            return error(response.text, response.status_code)
+
+            return error(
+                response.text,
+                response.status_code
+            )
 
         return jsonify(response.json())
 
-    except requests.RequestException as e:
-        logger.exception(e)
-        return error("Unable to fetch generation status.", 502)
+    except requests.RequestException:
+
+        return error(
+            "Unable to fetch generation status.",
+            502
+        )
 
 
 # ============================================================
@@ -319,7 +338,11 @@ def generation_status():
 # ============================================================
 
 def generation_result():
-    request_id = request.args.get("request_id", "").strip()
+
+    request_id = request.args.get(
+        "request_id",
+        ""
+    ).strip()
 
     if not request_id:
         return error("request_id is required.")
@@ -331,6 +354,7 @@ def generation_result():
     )
 
     try:
+
         response = requests.get(
             url,
             headers=FAL_HEADERS,
@@ -338,32 +362,60 @@ def generation_result():
         )
 
         if not response.ok:
-            return error(response.text, response.status_code)
 
-        result = response.json()
+            return error(
+                response.text,
+                response.status_code
+            )
 
-        logger.info("Video generated successfully.")
+        logger.info(
+            "Generation completed."
+        )
 
-        return jsonify(result)
+        return jsonify(
+            response.json()
+        )
 
-    except requests.RequestException as e:
-        logger.exception(e)
-        return error("Unable to fetch result.", 502)
+    except requests.RequestException:
 
+        return error(
+            "Unable to fetch generated video.",
+            502
+        )
 
 # ============================================================
-# GLOBAL ERROR HANDLER
+# PART 3 STARTS FROM ERROR HANDLERS
+# ============================================================# ============================================================
+# GLOBAL ERROR HANDLERS
 # ============================================================
 
 @app.errorhandler(404)
 def not_found(e):
-    return error("Endpoint not found.", 404)
+
+    return error(
+        "Endpoint not found.",
+        404
+    )
+
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+
+    return error(
+        "Method not allowed.",
+        405
+    )
 
 
 @app.errorhandler(500)
-def internal(e):
+def internal_server_error(e):
+
     logger.exception(e)
-    return error("Internal server error.", 500)
+
+    return error(
+        "Internal server error.",
+        500
+    )
 
 
 # ============================================================
@@ -372,8 +424,19 @@ def internal(e):
 
 @app.after_request
 def add_headers(response):
+
     response.headers["Cache-Control"] = "no-store"
+
     response.headers["X-Powered-By"] = "ReelMind AI"
+
+    response.headers["Access-Control-Allow-Headers"] = (
+        "Content-Type, Authorization"
+    )
+
+    response.headers["Access-Control-Allow-Methods"] = (
+        "GET, POST, OPTIONS"
+    )
+
     return response
 
 
@@ -382,17 +445,20 @@ def add_headers(response):
 # ============================================================
 
 if __name__ == "__main__":
-    logger.info("====================================")
-    logger.info("ReelMind AI Backend Started")
+
+    logger.info("=" * 50)
+    logger.info("🚀 ReelMind AI Backend Started")
     logger.info(f"Model : {FAL_MODEL}")
     logger.info(f"Port  : {PORT}")
-    logger.info("====================================")
+    logger.info("Backend Status : READY")
+    logger.info("=" * 50)
 
     app.run(
         host="0.0.0.0",
         port=PORT,
         debug=DEBUG
     )
+
 
 # ============================================================
 # END OF FILE
